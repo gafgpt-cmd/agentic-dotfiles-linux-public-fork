@@ -12,6 +12,7 @@
 #   batch follow <id>                       stream one job live
 #   batch wall [group]                      native Herdr live-pane wall (one pane per running job)
 #   batch pick                              pick an agent from a list; preview + follow its output
+#   batch watch [stop|status]               auto-open/refresh the wall whenever bots are running
 #   batch retry <group|id>                  restart failed job(s)
 #   batch parallel <group> <n>              set how many run at once in a group
 #   batch pause|resume <group>              hold / release a group
@@ -41,12 +42,14 @@ case "$cmd" in
     id=$(pueue add --group "$group" --label "$label" --print-task-id --escape -- \
           bash "$EXEC" "$label" -- "$@") || die "enqueue failed"
     echo "queued: group=$group label=$label id=$id"
+    w=/home/user/firstmate/state/atlas-runs/agent-watch.sh; [ -x "$w" ] && bash "$w" ensure >/dev/null 2>&1 || true
     ;;
   ls)   need_daemon; pueue status ${1:+--group "$1"} ;;
   view) need_daemon; [ $# -ge 1 ] || die "usage: batch view <id>"; pueue log "$1" --full 2>/dev/null || pueue log "$1" ;;
   follow) need_daemon; [ $# -ge 1 ] || die "usage: batch follow <id>"; exec pueue follow "$1" ;;
   wall) w=/home/user/firstmate/state/atlas-runs/herdr-wall.sh; [ -x "$w" ] && exec bash "$w" || die "herdr-wall.sh not present (atlas-local tool)" ;;
   pick) p=/home/user/firstmate/state/atlas-runs/agent-pick.sh; [ -x "$p" ] && exec bash "$p" || die "agent-pick.sh not present (atlas-local tool)" ;;
+  watch) w=/home/user/firstmate/state/atlas-runs/agent-watch.sh; [ -x "$w" ] && exec bash "$w" "${1:-run}" || die "agent-watch.sh not present (atlas-local tool)" ;;
   retry)
     need_daemon; [ $# -ge 1 ] || die "usage: batch retry <group|id>"
     if [[ "$1" =~ ^[0-9]+$ ]]; then pueue restart --in-place "$1"; else
