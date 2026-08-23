@@ -47,7 +47,13 @@ case "$cmd" in
   ls)   need_daemon; pueue status ${1:+--group "$1"} ;;
   view) need_daemon; [ $# -ge 1 ] || die "usage: batch view <id>"; pueue log "$1" --full 2>/dev/null || pueue log "$1" ;;
   follow) need_daemon; [ $# -ge 1 ] || die "usage: batch follow <id>"; exec pueue follow "$1" ;;
-  wall) w=/home/user/firstmate/state/atlas-runs/herdr-wall.sh; [ -x "$w" ] && exec bash "$w" || die "herdr-wall.sh not present (atlas-local tool)" ;;
+  wall)
+    wz=/home/user/firstmate/state/atlas-runs/wezterm-wall.sh
+    hd=/home/user/firstmate/state/atlas-runs/herdr-wall.sh
+    if [ "${1:-}" != "--herdr" ] && command -v wezterm >/dev/null 2>&1 && wezterm cli list >/dev/null 2>&1 && [ -x "$wz" ]; then
+      exec bash "$wz"
+    elif [ -x "$hd" ]; then exec bash "$hd"
+    else die "no wall tool present (atlas-local)"; fi ;;
   pick) p=/home/user/firstmate/state/atlas-runs/agent-pick.sh; [ -x "$p" ] && exec bash "$p" || die "agent-pick.sh not present (atlas-local tool)" ;;
   watch) w=/home/user/firstmate/state/atlas-runs/agent-watch.sh; [ -x "$w" ] && exec bash "$w" "${1:-run}" || die "agent-watch.sh not present (atlas-local tool)" ;;
   retry)
