@@ -12,6 +12,7 @@
 #   batch follow <id>                       stream one job live
 #   batch wall [group]                      native Herdr live-pane wall (one pane per running job)
 #   batch agents                            compact live dashboard of every agent (one glance)
+#   batch subagents [show <id>]             pi/hermes Claude subagents across sessions (+ drill-in)
 #   batch pick                              pick an agent from a list; preview + follow its output
 #   batch watch [stop|status]               auto-open/refresh the wall whenever bots are running
 #   batch retry <group|id>                  restart failed job(s)
@@ -58,6 +59,7 @@ case "$cmd" in
     elif [ -x "$hd" ]; then exec bash "$hd"
     else die "no wall tool present (atlas-local)"; fi ;;
   agents) a=/home/user/firstmate/state/atlas-runs/agent-board.py; [ -f "$a" ] && exec python3 "$a" || die "agent-board.py not present (atlas-local tool)" ;;
+  subagents) s=/home/user/firstmate/state/atlas-runs/subagents.py; [ -f "$s" ] && exec python3 "$s" "$@" || die "subagents.py not present (atlas-local tool)" ;;
   pick) p=/home/user/firstmate/state/atlas-runs/agent-pick.sh; [ -x "$p" ] && exec bash "$p" || die "agent-pick.sh not present (atlas-local tool)" ;;
   watch) w=/home/user/firstmate/state/atlas-runs/agent-watch.sh; [ -x "$w" ] && exec bash "$w" "${1:-run}" || die "agent-watch.sh not present (atlas-local tool)" ;;
   retry)
