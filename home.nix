@@ -31,6 +31,20 @@ let
     AGENTIC_DISPLAY_SERVER = profile.displayServer;
   };
   weztermWrapped = config.lib.nixGL.wrap pkgs.wezterm;
+  # batch: one control surface for long-running background work (built on pueue).
+  # Relocatable core; atlas-specific bindings stay with the atlas project.
+  batch = pkgs.stdenv.mkDerivation {
+    name = "batch-control";
+    src = ./home/batch;
+    dontConfigure = true;
+    dontBuild = true;
+    installPhase = ''
+      mkdir -p $out/libexec/batch $out/bin
+      cp $src/batch.sh $src/batch-exec.sh $src/board.py $out/libexec/batch/
+      chmod +x $out/libexec/batch/batch.sh $out/libexec/batch/batch-exec.sh
+      ln -s $out/libexec/batch/batch.sh $out/bin/batch
+    '';
+  };
   # Taken from the environment so no username or home path is ever committed.
   # Needs --impure (rebuild.sh and bootstrap.sh pass it); pure eval sees "".
   fromEnv = name:
@@ -74,6 +88,8 @@ in
     uv
     shellcheck
     shfmt
+    pueue     # background job supervisor (engine behind `batch`)
+    batch     # `batch` control surface for long-running background work
     typescript
     mosh      # ssh that survives roaming/sleep; also provides mosh-server for inbound
     neovim
