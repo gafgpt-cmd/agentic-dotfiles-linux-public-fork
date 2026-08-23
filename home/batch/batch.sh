@@ -11,6 +11,7 @@
 #   batch view <id>                         full captured output of one job
 #   batch follow <id>                       stream one job live
 #   batch wall [group]                      native Herdr live-pane wall (one pane per running job)
+#   batch pick                              pick an agent from a list; preview + follow its output
 #   batch retry <group|id>                  restart failed job(s)
 #   batch parallel <group> <n>              set how many run at once in a group
 #   batch pause|resume <group>              hold / release a group
@@ -45,6 +46,7 @@ case "$cmd" in
   view) need_daemon; [ $# -ge 1 ] || die "usage: batch view <id>"; pueue log "$1" --full 2>/dev/null || pueue log "$1" ;;
   follow) need_daemon; [ $# -ge 1 ] || die "usage: batch follow <id>"; exec pueue follow "$1" ;;
   wall) w=/home/user/firstmate/state/atlas-runs/herdr-wall.sh; [ -x "$w" ] && exec bash "$w" || die "herdr-wall.sh not present (atlas-local tool)" ;;
+  pick) p=/home/user/firstmate/state/atlas-runs/agent-pick.sh; [ -x "$p" ] && exec bash "$p" || die "agent-pick.sh not present (atlas-local tool)" ;;
   retry)
     need_daemon; [ $# -ge 1 ] || die "usage: batch retry <group|id>"
     if [[ "$1" =~ ^[0-9]+$ ]]; then pueue restart --in-place "$1"; else
