@@ -48,10 +48,12 @@ case "$cmd" in
   view) need_daemon; [ $# -ge 1 ] || die "usage: batch view <id>"; pueue log "$1" --full 2>/dev/null || pueue log "$1" ;;
   follow) need_daemon; [ $# -ge 1 ] || die "usage: batch follow <id>"; exec pueue follow "$1" ;;
   wall)
-    wz=/home/user/firstmate/state/atlas-runs/wezterm-wall.sh
+    # Herdr-default (it's inside your view); --wezterm for a native window; --raw for full tail
     hd=/home/user/firstmate/state/atlas-runs/herdr-wall.sh
-    if [ "${1:-}" != "--herdr" ] && command -v wezterm >/dev/null 2>&1 && wezterm cli list >/dev/null 2>&1 && [ -x "$wz" ]; then
-      exec bash "$wz"
+    wz=/home/user/firstmate/state/atlas-runs/wezterm-wall.sh
+    use_wz=0
+    for a in "$@"; do case "$a" in --raw) export RAW=1;; --wezterm) use_wz=1;; --herdr) use_wz=0;; esac; done
+    if [ "$use_wz" = 1 ] && [ -x "$wz" ]; then exec bash "$wz"
     elif [ -x "$hd" ]; then exec bash "$hd"
     else die "no wall tool present (atlas-local)"; fi ;;
   pick) p=/home/user/firstmate/state/atlas-runs/agent-pick.sh; [ -x "$p" ] && exec bash "$p" || die "agent-pick.sh not present (atlas-local tool)" ;;
