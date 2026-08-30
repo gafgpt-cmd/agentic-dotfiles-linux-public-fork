@@ -1,4 +1,4 @@
-{ config, pkgs, lib, codexPrivacy, herdr-pkg, nixgl, pi-pkg, profile, ... }:
+{ config, pkgs, lib, codexPrivacy, herdr-pkg, nixgl, pi-pkg, profile, wezterm-pkg, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
@@ -30,7 +30,7 @@ let
   displayVariables = {
     AGENTIC_DISPLAY_SERVER = profile.displayServer;
   };
-  weztermWrapped = config.lib.nixGL.wrap pkgs.wezterm;
+  weztermWrapped = config.lib.nixGL.wrap wezterm-pkg;
   # Taken from the environment so no username or home path is ever committed.
   # Needs --impure (rebuild.sh and bootstrap.sh pass it); pure eval sees "".
   fromEnv = name:
