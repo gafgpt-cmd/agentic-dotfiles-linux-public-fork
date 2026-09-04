@@ -75,11 +75,33 @@ config.front_end = "WebGpu"
 config.webgpu_power_preference = "HighPerformance"
 -- XFCE 4.16's tasklist implements "Launch New Instance" by executing the
 -- window's /proc/<pid>/exe. For nixGL-wrapped apps that resolves to the raw Nix
--- binary, without the wrapper's driver environment. That helper delegates to
--- the existing GUI, but enumerate_gpus() panics in EGL before it can do so.
+-- binary, without the wrapper's driver environment (nixGLIntel exports
+-- LIBGL_DRIVERS_PATH among others). This build has no usable GL in that state:
+-- WebGpu panics inside wgpu's EGL init while creating the first window, and the
+-- OpenGL front end fails to create the window at all. It only hands off to the
+-- running GUI when DISPLAY matches byte for byte (":0" and ":0.0" do not), so
+-- relaunch through the wrapper and quit before any window exists. Limited to
+-- the first evaluation in a process so a config reload can never exit a running
+-- GUI; the marker variable bounds a misdetection to a single hop.
 local is_unwrapped_nix_helper = is_linux
   and wezterm.executable_dir:find("/nix/store/", 1, true) == 1
   and os.getenv("LIBGL_DRIVERS_PATH") == nil
+local first_evaluation = not wezterm.GLOBAL.config_evaluated
+wezterm.GLOBAL.config_evaluated = true
+if
+  is_unwrapped_nix_helper
+  and first_evaluation
+  and wezterm.gui
+  and os.getenv("WEZTERM_NIXGL_RELAUNCHED") == nil
+then
+  wezterm.background_child_process({
+    "/usr/bin/env",
+    "WEZTERM_NIXGL_RELAUNCHED=1",
+    wezterm.home_dir .. "/.nix-profile/bin/wezterm",
+    "start",
+  })
+  os.exit(0)
+end
 if not is_unwrapped_nix_helper then
   local ok, gpus = pcall(wezterm.gui.enumerate_gpus)
   if ok and gpus then
