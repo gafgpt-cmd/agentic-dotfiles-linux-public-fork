@@ -1,0 +1,52 @@
+name: Update flake inputs
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 5 * * 1"
+
+concurrency:
+  group: update-flake-inputs
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    name: Update and validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+        with:
+          determinate: false
+
+      - name: Update inputs
+        run: nix flake update
+
+      - name: Evaluate every profile
+        run: nix flake check --no-build --impure
+
+      - name: Open or update pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: automation/update-flake-lock
+          delete-branch: true
+          add-paths: flake.lock
+          commit-message: "chore: update flake inputs"
+          title: "chore: update flake inputs"
+          body: |
+            Automated weekly refresh of all moving flake inputs.
+
+            Validation completed before this pull request was created:
+            - `nix flake check --no-build --impure`
+
+            After merging, each computer can run `git pull` and `./rebuild.sh`.
