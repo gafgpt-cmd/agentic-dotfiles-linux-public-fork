@@ -1,4 +1,4 @@
-{ config, pkgs, lib, codexPrivacy, herdr-pkg, nixgl, pi-pkg, profile, ... }:
+{ config, pkgs, lib, codexPrivacy, herdr-pkg, nixgl, pi-pkg, profile, wezterm-pkg, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
@@ -30,7 +30,7 @@ let
   displayVariables = {
     AGENTIC_DISPLAY_SERVER = profile.displayServer;
   };
-  weztermWrapped = config.lib.nixGL.wrap pkgs.wezterm;
+  weztermWrapped = config.lib.nixGL.wrap wezterm-pkg;
   # batch: one control surface for long-running background work (built on pueue).
   # Relocatable core; atlas-specific bindings stay with the atlas project.
   batch = pkgs.stdenv.mkDerivation {
@@ -96,7 +96,6 @@ in
     pi-pkg
     # apps that were Homebrew casks/brews on macOS
     weztermWrapped
-    claude-code
     herdr-pkg
     # the font everything renders in
     nerd-fonts.hack
@@ -135,6 +134,7 @@ in
   # never reads (it uses /etc/zsh/zshrc), so an interactive shell ends up with a
   # bare /usr/bin PATH and none of the packages above.
   home.sessionPath = [
+    "$HOME/.local/bin"           # prefer the current native Claude release
     "$HOME/.nix-profile/bin"          # everything in home.packages
     "/nix/var/nix/profiles/default/bin" # nix itself
   ];
@@ -157,6 +157,10 @@ in
       m = "git switch main";
       cc = "claude";
       co = "codex";
+      # herdr refuses to update from inside one of its own sessions; run the
+      # updater detached through the user service manager, then hand the live
+      # sessions over to the new binary.
+      herdr-update = "systemd-run --user --wait --pipe --collect --quiet -- $HOME/.local/bin/herdr update --handoff";
     };
   };
 
