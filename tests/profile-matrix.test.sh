@@ -122,6 +122,7 @@ package.preload["wezterm"] = function()
     default_hyperlink_rules = function() return {} end,
     executable_dir = "/usr/bin",
     font_with_fallback = function(families) return families end,
+    GLOBAL = {},
     gui = { enumerate_gpus = function() return {} end },
     home_dir = os.getenv("HOME"),
     on = function(event, callback) handlers[event] = callback end,
