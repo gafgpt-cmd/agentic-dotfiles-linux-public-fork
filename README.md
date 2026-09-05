@@ -187,7 +187,7 @@ You only run `./rebuild.sh` when you change something that isn't just a symlinke
 
 Pi is handled more narrowly: Home Manager links authored themes, extensions, `models.json`, and `settings.json`, never `~/.pi/agent` as a whole. Credentials, sessions, caches, downloaded packages, and Calm's local toggle remain outside Git.
 
-The Pi settings pin `pi-web-access`, Codex fast mode, and OpenAI server-side compaction. These packages execute with your user permissions; review their immutable versions in `home/.pi/agent/settings.json` before switching. The compaction package sends relevant conversation state to OpenAI.
+The Pi settings pin `pi-web-access` and Codex fast mode. These packages execute with your user permissions; review their immutable versions in `home/.pi/agent/settings.json` before switching.
 Pi itself is pinned through a separate nixpkgs snapshot because the 26.05 stable snapshot still carries Pi 0.75; the Calm extension's real terminal test targets the pinned Pi 0.84.
 
 ## Desktop and display-server support
@@ -219,7 +219,7 @@ metrics_exporter = "none"
 log_user_prompt = false
 ```
 
-The bundled local extensions and pinned Pi packages were checked for additional remote analytics hooks. Functional network traffic remains: model/API calls, web access, GitHub access, package downloads, and the explicitly documented server-side compaction request are not telemetry.
+The bundled local extensions and pinned Pi packages were checked for additional remote analytics hooks. Functional network traffic remains: model/API calls, web access, GitHub access, and package downloads are not telemetry.
 
 ## What changed from the macOS original
 
