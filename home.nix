@@ -107,22 +107,10 @@ in
   # Graphical apps inherit privacy controls without requiring ownership of a custom shell.
   systemd.user.sessionVariables = privacyVariables // displayVariables;
 
-  # Weekly upstream dependency check (zero tokens — just version comparison + optional desktop notification).
-  systemd.user.services.check-upstream-deps = {
-    Unit.Description = "Check upstream tool versions (ARS, pi-subagents, Claude Code)";
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${dotfiles}/scripts/check-upstream-deps.sh";
-    };
-  };
-  systemd.user.timers.check-upstream-deps = {
-    Unit.Description = "Weekly upstream dependency check";
-    Timer = {
-      OnCalendar = "Mon 09:00";
-      Persistent = true;  # run if missed (laptop was off)
-    };
-    Install.WantedBy = [ "timers.target" ];
-  };
+  # The former weekly check-upstream-deps timer lived here. It is superseded by
+  # doctor-franken's unified Monday maintenance plus kun-port-sync, which
+  # disabled it on every install while each home-manager switch re-enabled it.
+  # One schedule owns updates now; do not add a second timer here.
 
   # Codex analytics defaults to on, so environment-wide OTEL controls are not enough.
   home.activation.disableCodexTelemetry = config.lib.dag.entryAfter [ "writeBoundary" ] ''
