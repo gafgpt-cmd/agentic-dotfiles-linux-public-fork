@@ -11,7 +11,7 @@ Nothing machine-specific is committed: username, home directory, and CPU archite
 
 Running the switch builds:
 
-- Nix user packages (Git, GitHub CLI, ripgrep, fd, fzf, jq, lazygit, tmux, mise, uv, TypeScript, shellcheck, shfmt, Mosh, Neovim, WezTerm, Claude Code, Pi, herdr, Hack Nerd Font)
+- Nix user packages (Git, GitHub CLI, ripgrep, fd, fzf, jq, lazygit, tmux, mise, uv, TypeScript, shellcheck, shfmt, Mosh, Neovim, WezTerm, Pi, Hack Nerd Font). Claude Code and herdr are native self-updating releases in `~/.local/bin`, which is first on the session PATH.
 - Selectable GNOME settings via dconf (dark theme, fast key repeat, tap to click, Nautilus list view), XFCE settings via xfconf, a KDE compatibility profile, or no desktop settings
 - Shell (zsh, aliases, starship prompt)
 - Editor (a fully pinned Kickstart Neovim config with Tokyo Night)
@@ -41,7 +41,7 @@ flake.nix + flake.lock + home.nix + profile.nix
 
 In this repository:
 
-- `flake.nix` declares the nixpkgs, Home Manager, nixGL, separate nixpkgs snapshot for Pi, and herdr inputs and exposes the configurations Home Manager can build; `flake.lock` locks those inputs to exact revisions.
+- `flake.nix` declares the nixpkgs, Home Manager, nixGL, and the separate nixpkgs snapshots for Pi and WezTerm, and exposes the configurations Home Manager can build; `flake.lock` locks those inputs to exact revisions. Every input follows a branch, so `nix flake update` moves all of them.
 - `home.nix` declares the programs, font, privacy controls, PATH entries, and optional config-file links that should exist for the current user.
 - `profile.nix` decides which existing shell, editor, terminal, agent, and desktop settings Home Manager is allowed to adopt.
 - `home-manager switch` evaluates those declarations, downloads or builds the required packages in the Nix store, creates a new generation, and activates it for the current user.
@@ -228,7 +228,7 @@ The bundled local extensions and pinned Pi packages were checked for additional 
 | nix-darwin `darwinConfigurations` | standalone home-manager `homeConfigurations` |
 | `configuration.nix` system defaults | selected `gnome.nix`, `xfce.nix`, `kde.nix`, or none |
 | Homebrew casks (`wezterm`, `claude-code`) | nixpkgs packages in `home.nix` |
-| `herdr` Homebrew formula | the upstream herdr flake, pinned in `flake.nix` |
+| `herdr` Homebrew formula | the native herdr release in `~/.local/bin`, updated with the `herdr-update` alias (its flake would compile a Rust toolchain from source) |
 | `darwin-rebuild switch` (sudo) | `home-manager switch` (no sudo) |
 | `/Users/$user` | `/home/$user` |
 

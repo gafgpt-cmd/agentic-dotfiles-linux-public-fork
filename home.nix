@@ -1,4 +1,4 @@
-{ config, pkgs, lib, codexPrivacy, herdr-pkg, nixgl, pi-pkg, profile, wezterm-pkg, ... }:
+{ config, pkgs, lib, codexPrivacy, nixgl, pi-pkg, profile, wezterm-pkg, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
@@ -96,7 +96,7 @@ in
     pi-pkg
     # apps that were Homebrew casks/brews on macOS
     weztermWrapped
-    herdr-pkg
+    # herdr: native self-updating release in ~/.local/bin, not built from source here
     # the font everything renders in
     nerd-fonts.hack
   ];

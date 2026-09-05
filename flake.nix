@@ -17,11 +17,12 @@
     # Keep WezTerm current without moving the whole user environment to unstable.
     nixpkgs-wezterm.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # herdr isn't in nixpkgs; upstream ships its own flake, Linux included.
-    herdr.url = "github:herdrdev/herdr";
+    # herdr is deliberately NOT built here: its flake compiles a pinned Rust
+    # toolchain from source (gigabytes, hours, and it filled the root disk once).
+    # The native release in ~/.local/bin self-updates (`herdr-update` alias).
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs-pi, nixpkgs-wezterm, home-manager, nixgl, herdr }:
+  outputs = inputs@{ self, nixpkgs, nixpkgs-pi, nixpkgs-wezterm, home-manager, nixgl }:
     let
       # Impure on purpose: the same clone must work on any machine, any user,
       # any CPU arch, with nothing machine-specific committed here. The scripts
@@ -53,7 +54,6 @@
       mkHome = selectedProfile: home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         extraSpecialArgs = {
-          herdr-pkg = herdr.packages.${system}.default;
           profile = selectedProfile;
           inherit codexPrivacy nixgl pi-pkg wezterm-pkg;
         };
