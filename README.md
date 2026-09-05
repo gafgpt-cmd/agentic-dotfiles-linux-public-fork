@@ -12,7 +12,7 @@ Nothing machine-specific is committed: username, home directory, and CPU archite
 Running the switch builds:
 
 - Nix user packages (Git, GitHub CLI, ripgrep, fd, fzf, jq, lazygit, tmux, mise, uv, TypeScript, shellcheck, shfmt, Mosh, Neovim, WezTerm, Claude Code, Pi, herdr, Hack Nerd Font)
-- Selectable GNOME/XFCE settings, a KDE compatibility profile, or no desktop settings
+- Selectable GNOME settings via dconf (dark theme, fast key repeat, tap to click, Nautilus list view), XFCE settings via xfconf, a KDE compatibility profile, or no desktop settings
 - Shell (zsh, aliases, starship prompt)
 - Editor (a fully pinned Kickstart Neovim config with Tokyo Night)
 - Terminal (WezTerm with rose-pine moon and clear inactive-window dimming)

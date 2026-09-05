@@ -2,7 +2,7 @@
 
 Deliberate decisions in this repo - do NOT silently revert them:
 
-- This is a Linux-only port of a macOS nix-darwin repo. Do not reintroduce nix-darwin, nix-homebrew, or `configuration.nix`. Desktop and display-server selection live in `profile.nix`; supported desktop modules are GNOME, XFCE, KDE, and none. Every desktop builds for X11 and Wayland.
+- This is a Linux-only port of a macOS nix-darwin repo. Do not reintroduce nix-darwin, nix-homebrew, or `configuration.nix`. Desktop and display-server selection live in `profile.nix`; supported desktop modules are GNOME, XFCE, KDE, and none. Every desktop builds for X11 and Wayland. The macOS-to-Linux mapping is tabled at the end of README.md.
 - KDE compatibility owns no KConfig files or keys. Never add broad global-theme application or a non-atomic KDE config writer.
 - Standalone home-manager is a deliberate choice over NixOS: the target machines run their own distro (Debian 13/GNOME today) and only the user environment is managed here. Anything needing root or a system service is out of scope.
 - GPU applications from nixpkgs need `nixGL` on these non-NixOS hosts. WezTerm and the generated `nvim.desktop` deliberately share the wrapped package; do not restore `Terminal=true`, which routes Neovim through distro-specific terminal adapters. Keep the shared WezTerm config on hardware-selected WebGPU: forcing Linux-wide OpenGL makes the distro WezTerm sluggish, so fix Nix graphics access in the wrapper instead. This repo owns the live WezTerm config: `home/.config/wezterm/wezterm.lua` is the source of truth (shared verbatim with the Windows box) and `manageWezterm` is on, so home-manager symlinks the directory live via `mkOutOfStoreSymlink`.
