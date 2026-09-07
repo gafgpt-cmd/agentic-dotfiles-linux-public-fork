@@ -76,24 +76,16 @@ in
   home.stateVersion = "24.11";
   home.packages = with pkgs; [
     # cli i use constantly
-    ripgrep   # fast search
-    fd        # fast find
-    fzf       # fuzzy finder
-    jq        # json on the command line
-    git
-    gh
-    lazygit
-    tmux
-    mise
-    uv
+    # omar-chi (Omarchy/Arch, 2026-09): ripgrep/fd/fzf/jq/git/gh/lazygit/tmux/
+    # mise/uv/pueue/neovim/pi-pkg already present via pacman/mise and working;
+    # skipped here so home-manager doesn't shadow them with a second copy on
+    # $HOME/.nix-profile/bin (see home.sessionPath below). Re-add per-machine
+    # if a future machine actually needs Nix to provide them.
     shellcheck
     shfmt
-    pueue     # background job supervisor (engine behind `batch`)
-    batch     # `batch` control surface for long-running background work
+    batch     # `batch` control surface for long-running background work; calls system pueue at runtime
     typescript
     mosh      # ssh that survives roaming/sleep; also provides mosh-server for inbound
-    neovim
-    pi-pkg
     # apps that were Homebrew casks/brews on macOS
     weztermWrapped
     # herdr: native self-updating release in ~/.local/bin, not built from source here
@@ -105,7 +97,13 @@ in
   home.sessionVariables = privacyVariables // displayVariables
     // lib.optionalAttrs profile.manageShell { EDITOR = "nvim"; };
   # Graphical apps inherit privacy controls without requiring ownership of a custom shell.
-  systemd.user.sessionVariables = privacyVariables // displayVariables;
+  # XDG_DATA_DIRS: without this, Nix-installed GUI apps (e.g. wezterm) have a
+  # correct .desktop file under ~/.nix-profile/share/applications but no
+  # graphical launcher ever sees it -- PATH alone (home.sessionPath above)
+  # gets the binary running, not the desktop entry.
+  systemd.user.sessionVariables = privacyVariables // displayVariables // {
+    XDG_DATA_DIRS = "\${XDG_DATA_DIRS}:${config.home.homeDirectory}/.nix-profile/share:/nix/var/nix/profiles/default/share";
+  };
 
   # The former weekly check-upstream-deps timer lived here. It is superseded by
   # doctor-franken's unified Monday maintenance plus kun-port-sync, which
