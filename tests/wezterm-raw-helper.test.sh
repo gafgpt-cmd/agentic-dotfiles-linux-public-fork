@@ -23,6 +23,7 @@ if ! stderr=$(env \
   -u LIBGL_DRIVERS_PATH \
   -u LD_LIBRARY_PATH \
   RUST_BACKTRACE=1 \
+  WEZTERM_NIXGL_RELAUNCHED=1 \
   "$raw_bin" --config-file "$config" show-keys 2>&1 >/dev/null); then
   printf '%s\n' "$stderr" >&2
   fail "raw Nix helper failed while loading the WezTerm config"
@@ -67,6 +68,7 @@ LUA
 env \
   -u LIBGL_DRIVERS_PATH \
   -u LD_LIBRARY_PATH \
+  WEZTERM_NIXGL_RELAUNCHED=1 \
   WEZTERM_MAIN_CONFIG="$config" \
   WEZTERM_URI_PROOF="$uri_proof" \
   "$raw_bin" --config-file "$uri_config" show-keys >/dev/null 2>&1
