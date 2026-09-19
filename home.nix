@@ -16,6 +16,11 @@ let
     GNHF_TELEMETRY = "0";
     NO_MISTAKES_TELEMETRY = "0";
     LAVISH_AXI_TELEMETRY = "0";
+    # chrome-devtools-axi launches chrome-devtools-mcp through this shim, which
+    # forces the Google usage-statistics opt-out. The shim itself is deployed by
+    # the home.file link below; without it the axi bridge dies BRIDGE_NOT_READY.
+    CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS = "1";
+    CHROME_DEVTOOLS_AXI_MCP_PATH = "${config.home.homeDirectory}/.local/libexec/chrome-devtools-mcp-no-telemetry.mjs";
     HOMEBREW_NO_ANALYTICS = "1";
     NEXT_TELEMETRY_DISABLED = "1";
     ASTRO_TELEMETRY_DISABLED = "1";
@@ -202,6 +207,11 @@ in
   # toggle, so activating it never touches settings.json / statusline.
   home.file.".claude/skills/git-orient".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.claude/skills/git-orient";
+  # Always deployed: CHROME_DEVTOOLS_AXI_MCP_PATH (privacyVariables) points here.
+  home.file.".local/libexec/chrome-devtools-mcp-no-telemetry.mjs" = {
+    source = config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.local/libexec/chrome-devtools-mcp-no-telemetry.mjs";
+    executable = true;
+  };
 
   # Pi credentials and runtime state stay local. Only authored resources are linked.
   home.file.".pi/agent/themes" = lib.mkIf profile.managePiResources {
