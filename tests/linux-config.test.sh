@@ -204,9 +204,9 @@ jq -e '
   and ([.[] | select(test("dangerously-skip-permissions|--full-auto"))] | length) == 0
 ' >/dev/null <<<"$(hm_eval programs.zsh.shellAliases)" || fail "an unattended agent alias is back"
 
-jq -e 'index("pi-coding-agent")' >/dev/null \
+jq -e 'index("pi-coding-agent") == null' >/dev/null \
   <<<"$(hm_eval home.packages --apply 'ps: map (p: p.pname or p.name) ps')" \
-  || fail "the tested Pi package is not installed by Home Manager"
+  || fail "the host Pi package is shadowed by Home Manager"
 
 # Standalone Home Manager packages cannot see a non-NixOS host's graphics
 # stack directly. The installed WezTerm must therefore differ from raw nixpkgs.
